@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+
+
+
+model User {
+
+id  String @id @default(cuid())
+name String
+password String 
+email  String @unique
+role   Role @default(USER)
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+favourites Favourite[]
+
+@@index([role])
+
+}
+
+
+model Recipe{
+
+id   String   @id @default(cuid())
+title String @unique
+slug  String @unique
+categoryId String
+category Category @relation(fields: [categoryId], references:[id])
+
+imageUrl String
+instructionContent String
+ingredientList String
+equipment  String
+prepTime   Int
+cookTime   Int
+totalTime  Int
+yield      Int
+isActive  Boolean @default(true)
+
+favourites Favourite[]
+
+@@index([isActive])
+}
+
+
+model Category{
+
+id String @id @default(cuid())
+name String
+imageUrl String @unique
+slug   String @unique
+isAvailable Boolean @default(true)
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+recipes Recipe[]
+
+@@index([isAvailable])
+}
+
+
+model Favourite{
+  
+userId String
+recipeId String
+createdAt DateTime @default(now())
+updatedAt  DateTime @updatedAt
+
+user User @relation(fields: [userId], references:[id])
+recipe Recipe @relation(fields: [recipeId], references:[id])
+
+@@id([userId,recipeId])
+@@index([createdAt])
+ }
+
+
+
